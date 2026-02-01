@@ -49,8 +49,8 @@ pip install psutil pywin32
 Клонировать репозиторий:
 
 ```bash
-git clone https://github.com/your-username/steam-download-monitor.git
-cd steam-download-monitor
+git clone https://github.com/Sepl-flek/steam-download.git
+cd steam-download
 ```
 
 Установить зависимости:
