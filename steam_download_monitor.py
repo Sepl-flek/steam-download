@@ -45,15 +45,22 @@ def get_active_game(log_path):
     return game_name, status
 
 
-def get_steam_network_speed():
+def get_steam_download_speed():
     for proc in psutil.process_iter(['name']):
-        if proc.info['name'] and 'steam' in proc.info['name'].lower():
-            net1 = proc.net_io_counters()
-            time.sleep(1)
-            net2 = proc.net_io_counters()
-            speed = (net2.bytes_recv - net1.bytes_recv) / 1024 / 1024
-            return max(speed, 0)
+        try:
+            if proc.info['name'] and 'steam' in proc.info['name'].lower():
+                io1 = proc.io_counters()
+                time.sleep(1)
+                io2 = proc.io_counters()
+
+                bytes_written = io2.write_bytes - io1.write_bytes
+                speed_mb = bytes_written / 1024 / 1024
+                return max(speed_mb, 0)
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            continue
+
     return 0.0
+
 
 
 def main():
@@ -64,7 +71,7 @@ def main():
 
     for minute in range(1, TOTAL_TIME + 1):
         game, status = get_active_game(content_log)
-        speed = get_steam_network_speed()
+        speed = get_steam_download_speed()
 
         print(f"[{datetime.now().strftime('%H:%M:%S')}] "
               f"Минута {minute}/5")
